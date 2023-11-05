@@ -42,7 +42,7 @@ func NewAuthenticator() *Authenticator {
 }
 
 // Strategy Pattern
-type MovieListingStrategy interface {
+type MovieListing interface {
 	ListMovies(movies []Movie)
 }
 
@@ -163,38 +163,47 @@ func register(authenticator *Authenticator) {
 }
 
 // Movie listing function
-func movieListing(strategy MovieListingStrategy, movies []Movie) {
-	strategy.ListMovies(movies)
+func movieListing(strategy MovieListing, movies []Movie) {
+	for {
+		strategy.ListMovies(movies)
 
-	fmt.Print("Enter the title of the movie you want to book tickets for (or type 'exit' to log out): ")
-	movieTitle, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	movieTitle = movieTitle[:len(movieTitle)-1]
+		fmt.Print("Enter the title of the movie you want to book tickets for (or type 'exit' to log out): ")
+		var movieTitle string
+		fmt.Scanln(&movieTitle)
 
-	if movieTitle == "exit" {
-		currentUser = User{}
-		fmt.Println("Logged out.")
-		return
-	}
-
-	for i, movie := range movies {
-		if movie.Title == movieTitle {
-			if movie.TicketsAvailable > 0 {
-				movies[i].TicketsAvailable--
-				fmt.Printf("You have booked a ticket for %s.\n", movie.Title)
-			} else {
-				fmt.Printf("Sorry, no tickets available for %s.\n", movie.Title)
-			}
+		if movieTitle == "exit" {
+			currentUser = User{}
+			fmt.Println("Logged out.")
 			return
 		}
+
+		found := false
+		for i, movie := range movies {
+			if movie.Title == movieTitle {
+				if movie.TicketsAvailable > 0 {
+					movies[i].TicketsAvailable--
+					fmt.Printf("You have booked a ticket for %s.\n", movie.Title)
+					found = true
+					break
+				} else {
+					fmt.Printf("Sorry, no tickets available for %s.\n", movie.Title)
+					found = true
+					break
+				}
+			}
+		}
+
+		if !found {
+			fmt.Printf("Movie with title '%s' not found.\n", movieTitle)
+		}
 	}
-	fmt.Printf("Movie with title '%s' not found.\n", movieTitle)
 }
 
 var users = make(map[string]User)
 var movies = []Movie{
-	{"Mission", "Action", 10},
-	{"Movie 2", "Comedy", 8},
-	{"Movie 3", "Drama", 15},
+	{"Mission-Impossible", "Action", 10},
+	{"Home-Alone", "Comedy", 8},
+	{"Titanic", "Drama", 15},
 }
 var currentUser User
 
