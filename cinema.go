@@ -34,7 +34,7 @@ func main() {
 
 		switch choice {
 		case 1:
-			login(authenticator)
+			login()
 		case 2:
 			register(authenticator)
 		case 3:

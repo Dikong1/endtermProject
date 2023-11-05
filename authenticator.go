@@ -47,7 +47,7 @@ func login() {
 	movieListing(ListingStrategy{}, movies)
 }
 
-func register(authenticator *Authenticator) {
+func register() {
 	fmt.Println("\nRegister:")
 	fmt.Print("Username: ")
 	var username string
