@@ -19,7 +19,6 @@ var movies = []Movie{
 var currentUser User
 
 func main() {
-	authenticator := GetAuthenticator()
 
 	fmt.Println("Welcome to the Cinema Ticket Booking System")
 
