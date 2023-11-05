@@ -36,7 +36,7 @@ func main() {
 		case 1:
 			login()
 		case 2:
-			register(authenticator)
+			register()
 		case 3:
 			fmt.Println("Goodbye!")
 			os.Exit(0)
