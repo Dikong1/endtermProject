@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"sync"
 )
 
-// Observer Pattern
 type Observer interface {
 	Update(user User)
 }
@@ -21,11 +19,11 @@ type Authenticator struct {
 	observers []Observer
 }
 
-func (a *Authenticator) Attach(observer Observer) {
+func (a *Authenticator) AddUser(observer Observer) {
 	a.observers = append(a.observers, observer)
 }
 
-func (a *Authenticator) Notify(user User) {
+func (a *Authenticator) NotifyUsers(user User) {
 	for _, observer := range a.observers {
 		observer.Update(user)
 	}
@@ -41,32 +39,13 @@ func NewAuthenticator() *Authenticator {
 	return &Authenticator{}
 }
 
-// Strategy Pattern
 type MovieListing interface {
 	ListMovies(movies []Movie)
 }
 
-type ByGenreListingStrategy struct{}
+type ListingStrategy struct{}
 
-func (s ByGenreListingStrategy) ListMovies(movies []Movie) {
-	fmt.Println("\nMovie Listing (Grouped by Genre):")
-	genres := make(map[string][]Movie)
-
-	for _, movie := range movies {
-		genres[movie.Genre] = append(genres[movie.Genre], movie)
-	}
-
-	for genre, movies := range genres {
-		fmt.Printf("Genre: %s\n", genre)
-		for _, movie := range movies {
-			fmt.Printf("Title: %s, Tickets Available: %d\n", movie.Title, movie.TicketsAvailable)
-		}
-	}
-}
-
-type SimpleListingStrategy struct{}
-
-func (s SimpleListingStrategy) ListMovies(movies []Movie) {
+func (s ListingStrategy) ListMovies(movies []Movie) {
 	fmt.Println("\nMovie Listing:")
 	fmt.Println("Title\tGenre\tTickets Available")
 	for _, movie := range movies {
@@ -74,7 +53,6 @@ func (s SimpleListingStrategy) ListMovies(movies []Movie) {
 	}
 }
 
-// Factory Method Pattern
 type MovieFactory interface {
 	CreateMovie(title, genre string, ticketsAvailable int) Movie
 }
@@ -89,67 +67,53 @@ func (f StandardMovieFactory) CreateMovie(title, genre string, ticketsAvailable 
 	}
 }
 
-type PremiumMovieFactory struct{}
-
-func (f PremiumMovieFactory) CreateMovie(title, genre string, ticketsAvailable int) Movie {
-	return Movie{
-		Title:            title,
-		Genre:            genre,
-		TicketsAvailable: ticketsAvailable,
-	}
-}
-
-// Singleton Pattern
 var once sync.Once
 var authenticator *Authenticator
 
 func GetAuthenticator() *Authenticator {
 	once.Do(func() {
 		authenticator = NewAuthenticator()
-		authenticator.Attach(AuthenticationLogger{})
+		authenticator.AddUser(AuthenticationLogger{})
 	})
 	return authenticator
 }
 
-// Movie struct
 type Movie struct {
 	Title            string
 	Genre            string
 	TicketsAvailable int
 }
 
-// Login function
 func login(authenticator *Authenticator) {
 	fmt.Println("\nLogin:")
 	fmt.Print("Username: ")
-	username, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	username = username[:len(username)-1]
+	var username string
+	fmt.Scanln(&username)
 
 	fmt.Print("Password: ")
-	password, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	password = password[:len(password)-1]
+	var password string
+	fmt.Scanln(&password)
 
 	user, exists := users[username]
 	if !exists || user.Password != password {
-		fmt.Println("Invalid credentials. Please try again.")
+		fmt.Println("Invalid username or password. Please try again.")
 		return
 	}
 
 	currentUser = user
 	fmt.Printf("Welcome, %s!\n", currentUser.Username)
-	movieListing(ByGenreListingStrategy{}, movies)
+	movieListing(ListingStrategy{}, movies)
 }
 
-// Register function
 func register(authenticator *Authenticator) {
 	fmt.Println("\nRegister:")
 	fmt.Print("Username: ")
-	username, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	username = username[:len(username)-1]
+	var username string
+	fmt.Scanln(&username)
 
 	fmt.Print("Password: ")
-	password, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	password = password[:len(password)-1]
+	var password string
+	fmt.Scanln(&password)
 
 	if _, exists := users[username]; exists {
 		fmt.Println("Username already exists. Please choose a different username.")
@@ -159,10 +123,9 @@ func register(authenticator *Authenticator) {
 	users[username] = User{Username: username, Password: password}
 	fmt.Printf("Registration successful. Welcome, %s!\n", username)
 	currentUser = users[username]
-	movieListing(SimpleListingStrategy{}, movies)
+	movieListing(ListingStrategy{}, movies)
 }
 
-// Movie listing function
 func movieListing(strategy MovieListing, movies []Movie) {
 	for {
 		strategy.ListMovies(movies)
