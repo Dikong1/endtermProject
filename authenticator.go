@@ -26,7 +26,7 @@ func GetAuthenticator() *Authenticator {
 	return authenticator
 }
 
-func login(authenticator *Authenticator) {
+func login() {
 	fmt.Println("\nLogin:")
 	fmt.Print("Username: ")
 	var username string
