@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -47,9 +49,10 @@ type ListingStrategy struct{}
 
 func (s ListingStrategy) ListMovies(movies []Movie) {
 	fmt.Println("\nMovie Listing:")
-	fmt.Println("Title\tGenre\tTickets Available")
+	fmt.Printf("%-25s %-15s %-20s\n", "Title", "Genre", "Tickets Available")
+	fmt.Println("------------------------------------------------------------")
 	for _, movie := range movies {
-		fmt.Printf("%s\t%s\t%d\n", movie.Title, movie.Genre, movie.TicketsAvailable)
+		fmt.Printf("%-25s %-15s %-20d\n", movie.Title, movie.Genre, movie.TicketsAvailable)
 	}
 }
 
@@ -112,12 +115,25 @@ func register(authenticator *Authenticator) {
 	var username string
 	fmt.Scanln(&username)
 
+	if username == "" {
+		fmt.Println("Username must not be empty")
+		return
+	}
+	if len(username) < 4 || len(username) > 16 {
+		fmt.Println("Length of username must be in range 4 to 16")
+		return
+	}
+
 	fmt.Print("Password: ")
 	var password string
 	fmt.Scanln(&password)
 
 	if len(password) == 0 {
 		fmt.Println("Password cannot be empty. Please try again.")
+		return
+	}
+	if len(password) < 4 || len(password) > 16 {
+		fmt.Println("Length of password must be in range 4 to 16")
 		return
 	}
 	if _, exists := users[username]; exists {
@@ -136,8 +152,8 @@ func movieListing(strategy MovieListing, movies []Movie) {
 		strategy.ListMovies(movies)
 
 		fmt.Print("Enter the title of the movie you want to book tickets for (or type 'exit' to log out): ")
-		var movieTitle string
-		fmt.Scanln(&movieTitle)
+		movieTitle, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		movieTitle = strings.TrimSpace(movieTitle)
 
 		if movieTitle == "exit" {
 			currentUser = User{}
@@ -150,19 +166,16 @@ func movieListing(strategy MovieListing, movies []Movie) {
 			if movie.Title == movieTitle {
 				fmt.Print("Enter the number of tickets you want to book: ")
 				var numTickets int
-				fmt.Scan(&numTickets)
-
-				if movie.TicketsAvailable >= numTickets {
+				fmt.Scanln(&numTickets)
+				if movie.TicketsAvailable-numTickets >= 0 {
 					movies[i].TicketsAvailable -= numTickets
 					fmt.Println("--------------------------------------------------")
 					fmt.Printf("You have booked %d tickets for %s.\n", numTickets, movie.Title)
 					fmt.Println("--------------------------------------------------")
-
 					found = true
-					strategy.ListMovies(movies)
 					break
 				} else {
-					fmt.Printf("Sorry, only %d ticket avalable for 	 %s.\n", movie.TicketsAvailable, movie.Title)
+					fmt.Printf("Sorry, only %d ticket avalable for %s.\n", movie.TicketsAvailable, movie.Title)
 					found = true
 					break
 				}
@@ -177,9 +190,12 @@ func movieListing(strategy MovieListing, movies []Movie) {
 
 var users = make(map[string]User)
 var movies = []Movie{
-	{"Mission-Impossible", "Action", 10},
-	{"Home-Alone", "Comedy", 8},
+	{"Mission Impossible 7", "Action", 10},
+	{"Home Alone", "Comedy", 8},
 	{"Titanic", "Drama", 15},
+	{"Insidious 5", "Horror", 27},
+	{"Avatar 2", "Adventure", 18},
+	{"Spider-Man", "Fantasy", 0},
 }
 var currentUser User
 
