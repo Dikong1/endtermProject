@@ -101,6 +101,7 @@ func login(authenticator *Authenticator) {
 	}
 
 	currentUser = user
+	authenticator.NotifyUsers(currentUser)
 	fmt.Printf("Welcome, %s!\n", currentUser.Username)
 	movieListing(ListingStrategy{}, movies)
 }
@@ -115,6 +116,10 @@ func register(authenticator *Authenticator) {
 	var password string
 	fmt.Scanln(&password)
 
+	if len(password) == 0 {
+		fmt.Println("Password cannot be empty. Please try again.")
+		return
+	}
 	if _, exists := users[username]; exists {
 		fmt.Println("Username already exists. Please choose a different username.")
 		return
@@ -123,7 +128,7 @@ func register(authenticator *Authenticator) {
 	users[username] = User{Username: username, Password: password}
 	fmt.Printf("Registration successful. Welcome, %s!\n", username)
 	currentUser = users[username]
-	movieListing(ListingStrategy{}, movies)
+	login(authenticator)
 }
 
 func movieListing(strategy MovieListing, movies []Movie) {
@@ -143,13 +148,21 @@ func movieListing(strategy MovieListing, movies []Movie) {
 		found := false
 		for i, movie := range movies {
 			if movie.Title == movieTitle {
-				if movie.TicketsAvailable > 0 {
-					movies[i].TicketsAvailable--
-					fmt.Printf("You have booked a ticket for %s.\n", movie.Title)
+				fmt.Print("Enter the number of tickets you want to book: ")
+				var numTickets int
+				fmt.Scan(&numTickets)
+
+				if movie.TicketsAvailable >= numTickets {
+					movies[i].TicketsAvailable -= numTickets
+					fmt.Println("--------------------------------------------------")
+					fmt.Printf("You have booked %d tickets for %s.\n", numTickets, movie.Title)
+					fmt.Println("--------------------------------------------------")
+
 					found = true
+					strategy.ListMovies(movies)
 					break
 				} else {
-					fmt.Printf("Sorry, no tickets available for %s.\n", movie.Title)
+					fmt.Printf("Sorry, only %d ticket avalable for 	 %s.\n", movie.TicketsAvailable, movie.Title)
 					found = true
 					break
 				}
