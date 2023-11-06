@@ -97,7 +97,7 @@ func movieListing(strategy MovieListing, movies []Movie) {
 				var numOfTickets int
 				fmt.Print("How many ticket you want to book: ")
 				fmt.Scanln(&numOfTickets)
-				if movie.GetTickets()-numOfTickets > 0 {
+				if movie.GetTickets()-numOfTickets >= 0 {
 					movie.SetTickets(numOfTickets)
 					fmt.Println("--------------------------------------------")
 					fmt.Printf("You have booked %d tickets for %s.\n", numOfTickets, movie.getTitle())

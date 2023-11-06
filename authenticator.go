@@ -36,7 +36,7 @@ func GetAuthenticator() *Authenticator {
 
 	once.Do(func() {
 		authenticator = NewAuthenticator()
-		authenticator.AddUser(AuthenticationLogger{})
+		authenticator.AddObserver(AuthenticationLogger{})
 	})
 	return authenticator
 }
