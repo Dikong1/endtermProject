@@ -59,9 +59,27 @@ func register(authenticator *Authenticator) {
 	var username string
 	fmt.Scanln(&username)
 
+	if username == "" {
+		fmt.Println("Username cannot be empty")
+		return
+	}
+	if len(username) < 4 || len(username) > 16 {
+		fmt.Println("Length of username must be in range 4 to 16 ")
+		return
+	}
+
 	fmt.Print("Password: ")
 	var password string
 	fmt.Scanln(&password)
+
+	if password == "" {
+		fmt.Println("Password cannot be empty")
+		return
+	}
+	if len(password) < 4 || len(password) > 16 {
+		fmt.Println("Length of password must be in range 4 to 16 ")
+		return
+	}
 
 	if _, exists := users[username]; exists {
 		fmt.Println("Username already exists. Please choose a different username.")
