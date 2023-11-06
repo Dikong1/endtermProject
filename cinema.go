@@ -1,20 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 )
 
-var once sync.Once
-var authenticator *Authenticator
 
 var users = make(map[string]User)
 var factory = MovieFactory{}
 var movies = []Movie{
-	factory.CreateMovie("action", "Leon", 10),
-	factory.CreateMovie("comedy", "Man In Black", 8),
-	factory.CreateMovie("drama", "Seven Pounds", 7),
+
 }
 var currentUser User
 
