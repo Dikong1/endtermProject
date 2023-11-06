@@ -19,6 +19,16 @@ func (a *Authenticator) AddUser(observer Observer) {
 	a.observers = append(a.observers, observer)
 }
 
+func (a *Authenticator) NotifyUsers(user User) {
+	for _, observer := range a.observers {
+		observer.Update(user)
+	}
+}
+
+func (l AuthenticationLogger) Update(user User) {
+	fmt.Printf("User %s logged in.\n", user.Username)
+}
+
 var once sync.Once
 var authenticator *Authenticator
 
@@ -90,14 +100,4 @@ func register(authenticator *Authenticator) {
 	fmt.Printf("Registration successful. Welcome, %s!\n", username)
 	currentUser = users[username]
 	login(authenticator)
-}
-
-func (a *Authenticator) NotifyUsers(user User) {
-	for _, observer := range a.observers {
-		observer.Update(user)
-	}
-}
-
-func (l AuthenticationLogger) Update(user User) {
-	fmt.Printf("User %s logged in.\n", user.Username)
 }
