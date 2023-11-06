@@ -15,7 +15,7 @@ func NewAuthenticator() *Authenticator {
 	return &Authenticator{}
 }
 
-func (a *Authenticator) AddUser(observer Observer) {
+func (a *Authenticator) AddObserver(observer Observer) {
 	a.observers = append(a.observers, observer)
 }
 
