@@ -1,22 +1,17 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"strings"
-	"sync"
 )
-
 
 var users = make(map[string]User)
 var factory = MovieFactory{}
-var movies = []Movie{
-
-}
+var movies = []Movie{}
 var currentUser User
 
 func main() {
+	authenticator := GetAuthenticator()
 
 	fmt.Println("Welcome to the Cinema Ticket Booking System")
 
@@ -31,9 +26,9 @@ func main() {
 
 		switch choice {
 		case 1:
-			login()
+			login(authenticator)
 		case 2:
-			register()
+			register(authenticator)
 		case 3:
 			fmt.Println("Goodbye!")
 			os.Exit(0)

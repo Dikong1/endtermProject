@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
 
 type Authenticator struct {
@@ -18,7 +19,11 @@ func (a *Authenticator) AddUser(observer Observer) {
 	a.observers = append(a.observers, observer)
 }
 
+var once sync.Once
+var authenticator *Authenticator
+
 func GetAuthenticator() *Authenticator {
+
 	once.Do(func() {
 		authenticator = NewAuthenticator()
 		authenticator.AddUser(AuthenticationLogger{})
@@ -26,7 +31,7 @@ func GetAuthenticator() *Authenticator {
 	return authenticator
 }
 
-func login() {
+func login(authenticator *Authenticator) {
 	fmt.Println("\nLogin:")
 	fmt.Print("Username: ")
 	var username string
@@ -43,11 +48,12 @@ func login() {
 	}
 
 	currentUser = user
+	authenticator.NotifyUsers(currentUser)
 	fmt.Printf("Welcome, %s!\n", currentUser.Username)
 	movieListing(ListingStrategy{}, movies)
 }
 
-func register() {
+func register(authenticator *Authenticator) {
 	fmt.Println("\nRegister:")
 	fmt.Print("Username: ")
 	var username string
@@ -65,6 +71,7 @@ func register() {
 	users[username] = User{Username: username, Password: password}
 	fmt.Printf("Registration successful. Welcome, %s!\n", username)
 	currentUser = users[username]
+	login(authenticator)
 	movieListing(ListingStrategy{}, movies)
 }
 
