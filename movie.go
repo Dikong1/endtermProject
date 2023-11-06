@@ -65,9 +65,10 @@ type ListingStrategy struct{}
 
 func (s ListingStrategy) ListMovies(movies []Movie) {
 	fmt.Println("\nMovie Listing:")
-	fmt.Println("Title\tGenre\tTickets Available")
+	fmt.Printf("%-25s\t%-15s\t%-20s\n", "Title", "Genre", "Tickets Available")
+	fmt.Println("--------------------------------------------------------------------")
 	for _, movie := range movies {
-		fmt.Printf("%s\t%s\t%d\n", movie.getTitle(), movie.getGenre(), movie.GetTickets())
+		fmt.Printf("%-25s\t%-15s\t%-20d\n", movie.getTitle(), movie.getGenre(), movie.GetTickets())
 	}
 }
 

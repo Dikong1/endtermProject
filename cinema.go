@@ -7,7 +7,14 @@ import (
 
 var users = make(map[string]User)
 var factory = MovieFactory{}
-var movies = []Movie{}
+var movies = []Movie{
+	factory.CreateMovie("action", "Leon", 10),
+	factory.CreateMovie("comedy", "Friends", 14),
+	factory.CreateMovie("drama", "1+1", 0),
+	factory.CreateMovie("drama", "Seven Pounds", 7),
+	factory.CreateMovie("comedy", "Man In Black", 3),
+	factory.CreateMovie("action", "Mad Max", 23),
+}
 var currentUser User
 
 func main() {
