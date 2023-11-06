@@ -90,7 +90,6 @@ func register(authenticator *Authenticator) {
 	fmt.Printf("Registration successful. Welcome, %s!\n", username)
 	currentUser = users[username]
 	login(authenticator)
-	movieListing(ListingStrategy{}, movies)
 }
 
 func (a *Authenticator) NotifyUsers(user User) {
