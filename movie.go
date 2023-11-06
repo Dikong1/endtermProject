@@ -1,12 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
 
 type Movie interface {
 	getTitle() string
 	getGenre() string
 	GetTickets() int
-	SetTickets()
+	SetTickets(int)
 }
 
 type MovieListing interface {
@@ -19,10 +24,10 @@ type actionMovie struct {
 	TicketsAvailable int
 }
 
-func (m *actionMovie) getTitle() string { return m.Title }
-func (m *actionMovie) getGenre() string { return m.genre }
-func (m *actionMovie) GetTickets() int  { return m.TicketsAvailable }
-func (m *actionMovie) SetTickets()      { m.TicketsAvailable-- }
+func (m *actionMovie) getTitle() string   { return m.Title }
+func (m *actionMovie) getGenre() string   { return m.genre }
+func (m *actionMovie) GetTickets() int    { return m.TicketsAvailable }
+func (m *actionMovie) SetTickets(num int) { m.TicketsAvailable -= num }
 
 type comedyMovie struct {
 	Title            string
@@ -30,10 +35,10 @@ type comedyMovie struct {
 	TicketsAvailable int
 }
 
-func (m *comedyMovie) getTitle() string { return m.Title }
-func (m *comedyMovie) getGenre() string { return m.genre }
-func (m *comedyMovie) GetTickets() int  { return m.TicketsAvailable }
-func (m *comedyMovie) SetTickets()      { m.TicketsAvailable-- }
+func (m *comedyMovie) getTitle() string   { return m.Title }
+func (m *comedyMovie) getGenre() string   { return m.genre }
+func (m *comedyMovie) GetTickets() int    { return m.TicketsAvailable }
+func (m *comedyMovie) SetTickets(num int) { m.TicketsAvailable -= num }
 
 type dramaMovie struct {
 	Title            string
@@ -41,10 +46,10 @@ type dramaMovie struct {
 	TicketsAvailable int
 }
 
-func (m *dramaMovie) getTitle() string { return m.Title }
-func (m *dramaMovie) getGenre() string { return m.genre }
-func (m *dramaMovie) GetTickets() int  { return m.TicketsAvailable }
-func (m *dramaMovie) SetTickets()      { m.TicketsAvailable-- }
+func (m *dramaMovie) getTitle() string   { return m.Title }
+func (m *dramaMovie) getGenre() string   { return m.genre }
+func (m *dramaMovie) GetTickets() int    { return m.TicketsAvailable }
+func (m *dramaMovie) SetTickets(num int) { m.TicketsAvailable -= num }
 
 type MovieFactory struct{}
 
@@ -77,25 +82,30 @@ func movieListing(strategy MovieListing, movies []Movie) {
 		strategy.ListMovies(movies)
 
 		fmt.Print("Enter the title of the movie you want to book tickets for (or type 'exit' to log out): ")
-		var movieTitle string
-		fmt.Scanln(&movieTitle)
+		movieTitle, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		movieTitle = strings.TrimSpace(movieTitle)
 
 		if movieTitle == "exit" {
 			currentUser = User{}
 			fmt.Println("Logged out.")
-			return
+			break
 		}
 
 		found := false
 		for _, movie := range movies {
 			if movie.getTitle() == movieTitle {
-				if movie.GetTickets() > 0 {
-					movie.SetTickets()
-					fmt.Printf("You have booked a ticket for %s.\n", movie.getTitle())
+				var numOfTickets int
+				fmt.Print("How many ticket you want to book: ")
+				fmt.Scanln(&numOfTickets)
+				if movie.GetTickets()-numOfTickets > 0 {
+					movie.SetTickets(numOfTickets)
+					fmt.Println("--------------------------------------------")
+					fmt.Printf("You have booked %d tickets for %s.\n", numOfTickets, movie.getTitle())
+					fmt.Println("--------------------------------------------")
 					found = true
 					break
 				} else {
-					fmt.Printf("Sorry, no tickets available for %s.\n", movie.getTitle())
+					fmt.Printf("Sorry, only %d tickets available for %s.\n", movie.GetTickets(), movie.getTitle())
 					found = true
 					break
 				}
